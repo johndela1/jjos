@@ -6,16 +6,11 @@ void merge(int a[], int size, int m)
   char *buf = malloc(size * sizeof (int));
 
   for (int i = 0, left = 0, right = m; i < size; i++) {
-    if (left == m)
-      buf[i] = a[right++];
-    else if (right == size)
-      buf[i] = a[left++];
-    else if (a[left] <= a[right]) {
-      buf[i] = a[left++];
-    }
-    else {
-      buf[i] = a[right++];
-    }
+    buf[i] =
+      left == m ? a[right++]
+      : right == size ? a[left++]
+      : a[left] <= a[right] ? a[left++]
+      : a[right++];
   }
 
   for (int i = 0; i < size; i++)
