@@ -3,21 +3,24 @@
 
 void merge(int a[], int size, int m)
 {
-  int left, right, i;
   char *buf = malloc(size * sizeof (int));
-  char *bufp = buf;
-  for (i = 0, left = 0, right = m; i < m; i++) {
-    if (a[left] <= a[right]) {
-      *bufp++ = a[left++];
-      *bufp++ = a[right++];
+
+  for (int i = 0, left = 0, right = m; i < size; i++) {
+    if (left == m)
+      buf[i] = a[right++];
+    else if (right == size)
+      buf[i] = a[left++];
+    else if (a[left] <= a[right]) {
+      buf[i] = a[left++];
     }
     else {
-      *bufp++ = a[right++];
-      *bufp++ = a[left++];
+      buf[i] = a[right++];
     }
   }
-  for (i = 0; i < size; i++)
+
+  for (int i = 0; i < size; i++)
     a[i] = buf[i];
+
   free(buf);
 }
 
