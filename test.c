@@ -21,9 +21,6 @@ void pr_arr(int a[], int size)
   print_char('\n');
 
 }
-void hello() {
-  print_ascii("Hello world C!\n");
-}
 
 int add(int x, int y)
 {

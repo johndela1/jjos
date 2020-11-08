@@ -27,7 +27,6 @@ start:
 
 kernel_main:
 	bl init
-	bl hello
 
 	ldr r0, array_buf_bridge
 	mov r1, #5
