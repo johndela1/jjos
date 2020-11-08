@@ -1,9 +1,23 @@
 #include <stdio.h>
-#include <stdlib.h>
+
+#define MEMSIZE 4096
+char memory[MEMSIZE];
+char *basep = memory;
+void *kmalloc(int size)
+{
+  void *new = basep;
+  basep += size;
+  return new;
+}
+
+void kfree(void *ptr)
+{
+  return;
+}
 
 void merge(int a[], int size, int m)
 {
-  char *buf = malloc(size * sizeof (int));
+  char *buf = kmalloc(size * sizeof (int));
 
   for (int i = 0, left = 0, right = m; i < size; i++) {
     buf[i] =
@@ -16,7 +30,7 @@ void merge(int a[], int size, int m)
   for (int i = 0; i < size; i++)
     a[i] = buf[i];
 
-  free(buf);
+  kfree(buf);
 }
 
 void sort(int a[], int size)
