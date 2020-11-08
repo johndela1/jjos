@@ -1,5 +1,5 @@
 .data
-array_buff:
+array_buf:
 	.word 3, 2, 1, 9, 0
 .text
 .code 32
@@ -29,6 +29,18 @@ kernel_main:
 	bl init
 	bl hello
 
+	ldr r0, array_buf_bridge
+	mov r1, #5
+	bl pr_arr
+
+	ldr r0, array_buf_bridge
+	mov r1, #5
+	bl sort
+
+	ldr r0, array_buf_bridge
+	mov r1, #5
+	bl pr_arr
+
 	push {r11, lr}
 	add r11, sp, #0
 	sub sp, sp, #16
@@ -51,9 +63,11 @@ add1:
 	push {r11}
 	add r11, sp, #0
 	sub sp, sp, #12
-a	add r0, r1
+	add r0, r1
 	add sp, r11, #0
 	pop {r11}
 	bx lr
 
 str:    .asciz  "jjos initialized\n"
+array_buf_bridge:
+	.word array_buf
