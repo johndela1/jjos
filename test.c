@@ -1,3 +1,4 @@
+#define NULL (void *) 0
 volatile unsigned int * const UART0DR = (unsigned int *)0x101f1000;
 
 void print_char(const char c)
@@ -30,4 +31,23 @@ int add(int x, int y)
   print_char(((char)res)+48);
   print_char('\n');
   return res;
+}
+
+#define MEMSIZE 4096
+static char memory[MEMSIZE];
+static char *basep = memory;
+
+void *kmalloc(int size)
+{
+  if (basep + size < MEMSIZE) {
+    basep += size;
+    return basep - size;
+  } else {
+    return NULL;
+  }
+}
+
+void kfree(void *ptr)
+{
+  basep = ptr;
 }
