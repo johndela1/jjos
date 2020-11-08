@@ -10,6 +10,16 @@ void print_ascii(const char *s) {
     print_char(*s++);
 }
 
+void pr_arr(int a[], int size)
+{
+  for (int i = 0; i < size; i++) {
+    print_char(a[i]+48);
+    print_char(' ');
+  }
+  print_char('\r');
+  print_char('\n');
+
+}
 void hello() {
   print_ascii("Hello world C!\n");
 }
