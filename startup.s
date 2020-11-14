@@ -7,9 +7,9 @@ array_buf:
 @ Register  definition, for ARM VersatilePB with PL011 UART
 .equ    UART0_BASE, 0x101f1000
 .equ    UARTDR,     0x0
-
+.equ	RTC, 	    0x101E8000
 .global _Reset
-
+.global divmod
 _Reset:
 	b start
 	b .
@@ -26,7 +26,9 @@ start:
 	b .
 
 kernel_main:
-	bl init
+	bl test_uart
+	bl c_main
+
 
 	ldr r0, array_buf_bridge
 	mov r1, #5
@@ -49,7 +51,7 @@ kernel_main:
 	sub sp, r11, #0
 	pop {r11, pc}
 
-init:	ldr	r0, =str
+test_uart:	ldr	r0, =str
 	ldr	r1, =UART0_BASE
 1:      ldrb    r2, [r0], #1     @ Get next character
         cmp     r2, #0            @ ... until end of string
@@ -67,6 +69,19 @@ add1:
 	pop {r11}
 	bx lr
 
-str:    .asciz  "jjos initialized\n"
+divmod:
+    @ r0 dividend, r1 devisor, r2 quotient
+    mov r2, #0
+    b b2
+b1:
+    add r2, #1
+    sub r0, r1
+b2:
+    cmp r0, r1
+	bge b1
+	mov r1, r2
+    bx lr
+
+str:    .asciz  "uart: success\n"
 array_buf_bridge:
 	.word array_buf

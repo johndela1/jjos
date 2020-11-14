@@ -1,14 +1,48 @@
 #define NULL (void *) 0
 volatile unsigned int * const UART0DR = (unsigned int *)0x101f1000;
+volatile unsigned int * const RTC = (unsigned int *)0x101E8000;
+struct result {int quot; int rem;};
+
+struct result cdivmod(int dev, int div)
+{
+  struct result res;
+  int quot = 0;
+  while (dev >= div) {
+      quot++;
+      dev = dev - div;
+  }
+  res.quot = quot;
+  res.rem = dev;
+  return res;
+}
 
 void print_char(const char c)
 {
   *UART0DR = (unsigned int)c; /* Transmit char */
 }
 
+unsigned int get_time()
+{
+  return *RTC;
+}
 void print_ascii(const char *s) {
   while(*s != '\0')
     print_char(*s++);
+}
+
+void print_num(int n)
+{
+  #define BUFLEN 256
+  struct result r;
+  char buf[BUFLEN];
+  char *bufp = &buf[BUFLEN-1];
+  while (n) {
+    r = cdivmod(n, 10);
+    *--bufp = 48 + r.rem;
+    n = r.quot;
+  }
+  print_ascii(bufp);
+  print_ascii("\n");
 }
 
 void pr_arr(int a[], int size)
