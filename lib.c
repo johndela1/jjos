@@ -36,6 +36,8 @@ void print_num(int n)
   struct result r;
   char buf[BUFLEN];
   char *bufp = &buf[BUFLEN-1];
+  if (n == 0)
+    *--bufp = '0';
   while (n) {
     r = cdivmod(n, 10);
     *--bufp = 48 + r.rem;
