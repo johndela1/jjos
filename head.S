@@ -27,9 +27,8 @@ start:
 
 kernel_main:
 	bl test_uart
-	bl c_main
-
-
+	bl start_kernel
+        b .
 	ldr r0, array_buf_bridge
 	mov r1, #5
 	bl pr_arr

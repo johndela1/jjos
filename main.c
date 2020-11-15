@@ -1,7 +1,7 @@
 #include "lib.h"
 
 
-int c_main()
+void start_kernel(void)
 {
   long long res;
   unsigned int t1;
