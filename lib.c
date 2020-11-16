@@ -96,3 +96,21 @@ void sort(int a[], int size)
   sort(a + m, size - m);
   merge(a, size, m);
 }
+
+int kstrlen(const char *s)
+{
+  const char *ptr = s;
+  while(*ptr++);
+  return ptr - s;
+}
+
+int kstrncmp(const char *s1, const char *s2, int size)
+{
+  for (int i = 0; i < size; i++) {
+    if (s1[i] != s2[i])
+      return s1[i] < s2[i] ? -1 : 1;
+    if (!s1[i])
+      break;
+  }
+  return 0;
+}
