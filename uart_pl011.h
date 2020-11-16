@@ -19,7 +19,21 @@ typedef volatile struct __attribute__((packed)) {
 } uart_registers;
 
 #define FR_TXFF         (1 << 5u)
+#define FR_RXFE         (1 << 4u)
+
+#define DR_DATA_MASK    (0xFFu)
+#define RSRECR_ERR_MASK (0xFu)
+
+typedef enum {
+        UART_OK = 0,
+        UART_INVALID_ARGUMENT_BAUDRATE,
+        UART_INVALID_ARGUMENT_WORDSIZE,
+        UART_INVALID_ARGUMENT_STOP_BITS,
+        UART_RECEIVE_ERROR,
+        UART_NO_DATA
+} uart_error;
 
 void uart_putchar(char c);
 void uart_write(const char *s);
+uart_error uart_getchar(char *c);
 #endif

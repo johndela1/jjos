@@ -13,3 +13,17 @@ void uart_write(const char *s)
   while(*s)
     uart_putchar(*s++);
 }
+
+uart_error uart_getchar(char *c)
+{
+  if (uart0->FR & FR_RXFE) {
+    return UART_NO_DATA;
+  }
+  *c = uart0->DR & DR_DATA_MASK;
+  if (uart0->RSRECR & RSRECR_ERR_MASK) {
+    /* The character had an error */
+    uart0->RSRECR &= RSRECR_ERR_MASK;
+    return UART_RECEIVE_ERROR;
+  }
+  return UART_OK;
+}
