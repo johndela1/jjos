@@ -1,5 +1,7 @@
-#define NULL (void *) 0
-volatile unsigned int * const UART0DR = (unsigned int *)0x101f1000;
+#include "uart_pl011.h"
+
+//#define NULL (void *) 0
+
 volatile unsigned int * const RTC = (unsigned int *)0x101E8000;
 struct result {int quot; int rem;};
 
@@ -16,18 +18,9 @@ struct result cdivmod(int dev, int div)
   return res;
 }
 
-void print_char(const char c)
-{
-  *UART0DR = (unsigned int)c; /* Transmit char */
-}
-
 unsigned int get_time()
 {
   return *RTC;
-}
-void print_ascii(const char *s) {
-  while(*s != '\0')
-    print_char(*s++);
 }
 
 void print_num(int n)
@@ -43,27 +36,18 @@ void print_num(int n)
     *--bufp = 48 + r.rem;
     n = r.quot;
   }
-  print_ascii(bufp);
-  print_ascii("\n");
+  uart_write(bufp);
+  uart_write("\n");
 }
 
 void pr_arr(int a[], int size)
 {
   for (int i = 0; i < size; i++) {
-    print_char(a[i]+48);
-    print_char(' ');
+    uart_putchar(a[i]+48);
+    uart_putchar(' ');
   }
-  print_char('\r');
-  print_char('\n');
-
-}
-
-int add(int x, int y)
-{
-  int res = x + y;
-  print_char(((char)res)+48);
-  print_char('\n');
-  return res;
+  uart_putchar('\r');
+  uart_putchar('\n');
 }
 
 #define MEMSIZE 4096
