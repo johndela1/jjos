@@ -14,6 +14,12 @@ void uart_write(const char *s)
     uart_putchar(*s++);
 }
 
+void uart_writel(const char *s)
+{
+  uart_write(s);
+  uart_putchar('\n');
+}
+
 uart_error uart_getchar(char *c)
 {
   if (uart0->FR & FR_RXFE) {

@@ -1,6 +1,6 @@
 .data
-array_buf:
-	.word 3, 2, 1, 9, 0
+buf:
+	.asciz "32190"
 .text
 .code 32
 
@@ -26,19 +26,18 @@ start:
 	b .
 
 kernel_main:
-	bl start_kernel
-        b .
-	ldr r0, array_buf_bridge
-	mov r1, #5
-	bl pr_arr
+	ldr r0, buf_p
+	bl uart_writel
 
-	ldr r0, array_buf_bridge
+	ldr r0, buf_p
 	mov r1, #5
 	bl sort
 
-	ldr r0, array_buf_bridge
-	mov r1, #5
-	bl pr_arr
+	ldr r0, buf_p
+	bl uart_writel
+
+	bl start_kernel
+	b .
 
 divmod:
     @ r0 dividend, r1 devisor, r2 quotient
@@ -53,5 +52,5 @@ b2:
 	mov r1, r2
     bx lr
 
-array_buf_bridge:
-	.word array_buf
+buf_p:
+	.word buf

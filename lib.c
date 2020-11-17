@@ -40,10 +40,10 @@ void print_num(int n)
   uart_write("\n");
 }
 
-void pr_arr(int a[], int size)
+void pr_arr(char a[], int size)
 {
   for (int i = 0; i < size; i++) {
-    uart_putchar(a[i]+48);
+    uart_putchar(a[i]);
     uart_putchar(' ');
   }
   uart_putchar('\r');
@@ -69,7 +69,7 @@ void kfree(void *ptr)
   basep = ptr;
 }
 
-void merge(int a[], int size, int m)
+void merge(char a[], int size, int m)
 {
   char *buf = kmalloc(size * sizeof (int));
 
@@ -87,7 +87,7 @@ void merge(int a[], int size, int m)
   kfree(buf);
 }
 
-void sort(int a[], int size)
+void sort(char a[], int size)
 {
   if (size <= 1)
     return;
@@ -99,12 +99,13 @@ void sort(int a[], int size)
 
 int kstrlen(const char *s)
 {
-  const char *ptr = s;
-  while(*ptr++);
-  return ptr - s;
+  const char *sp;
+  for(sp = s; *sp; sp++)
+    ;
+  return sp - s;
 }
 
-int kstrncmp(const char *s1, const char *s2, int size)
+int jj_kstrncmp(const char *s1, const char *s2, int size)
 {
   for (int i = 0; i < size; i++) {
     if (s1[i] != s2[i])
@@ -113,4 +114,20 @@ int kstrncmp(const char *s1, const char *s2, int size)
       break;
   }
   return 0;
+}
+
+int kstrncmp(const char *cs, const char *ct, size_t count)
+{
+        unsigned char c1, c2;
+
+        while (count) {
+                c1 = *cs++;
+                c2 = *ct++;
+                if (c1 != c2)
+                        return c1 < c2 ? -1 : 1;
+                if (!c1)
+                        break;
+                count--;
+        }
+        return 0;
 }

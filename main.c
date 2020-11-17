@@ -37,6 +37,12 @@ static void parse_cmd()
 {
   if (!kstrncmp("uname\r", buf, kstrlen("uname\r")))
       uart_write("jjos\n");
+  else if (!kstrncmp("sort", buf, kstrlen("sort"))) {
+    char *bufp = &buf[kstrlen("sort")+1];
+    int len = kstrlen(bufp);
+    sort(bufp, len);
+    pr_arr(bufp, len);
+  }
   else
     uart_write("command not found\n");
 }
@@ -44,18 +50,20 @@ static void parse_cmd()
 void start_kernel(void)
 {
   char c;
-  uart_write("$ ");
+
+  uart_write("# ");
   while(1) {
     if (uart_getchar(&c) == UART_OK) {
       uart_putchar(c);
-      buf[buf_idx] = c;
+      buf[buf_idx % 64] = c;
       buf_idx++;
       if (c == '\r') {
 	buf[buf_idx] = 0;
+
 	uart_putchar('\n');
 	buf_idx = 0;
 	parse_cmd();
-	uart_write("$ ");
+	uart_write("# ");
       }
     }
   }
