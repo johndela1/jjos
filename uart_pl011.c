@@ -8,16 +8,10 @@ void uart_putchar(char c)
   uart0->DR = (unsigned int)c;
 }
 
-void uart_write(const char *s)
+void uart_write(const char *s, int size)
 {
-  while(*s)
-    uart_putchar(*s++);
-}
-
-void uart_writel(const char *s)
-{
-  uart_write(s);
-  uart_putchar('\n');
+  while(size--)
+    uart0->DR = (unsigned int)*s++;
 }
 
 uart_error uart_getchar(char *c)

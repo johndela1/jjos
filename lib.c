@@ -5,6 +5,14 @@
 volatile unsigned int * const RTC = (unsigned int *)0x101E8000;
 struct result {int quot; int rem;};
 
+int kstrlen(const char *s)
+{
+  const char *sp;
+  for(sp = s; *sp; sp++)
+    ;
+  return sp - s;
+}
+
 struct result cdivmod(int dev, int div)
 {
   struct result res;
@@ -36,8 +44,8 @@ void print_num(int n)
     *--bufp = 48 + r.rem;
     n = r.quot;
   }
-  uart_write(bufp);
-  uart_write("\n");
+  uart_write(bufp, kstrlen(bufp));
+  uart_write("\n" , 1);
 }
 
 void pr_arr(char a[], int size)
@@ -49,6 +57,12 @@ void pr_arr(char a[], int size)
   uart_putchar('\r');
   uart_putchar('\n');
 }
+
+void kputs(char *buf)
+{
+    uart_write(buf, kstrlen(buf));
+}
+
 
 #define MEMSIZE 4096
 static char memory[MEMSIZE];
@@ -87,22 +101,14 @@ void merge(char a[], int size, int m)
   kfree(buf);
 }
 
-void sort(char a[], int size)
+void ksort(char a[], int size)
 {
   if (size <= 1)
     return;
   int m = size >> 1;
-  sort(a, m);
-  sort(a + m, size - m);
+  ksort(a, m);
+  ksort(a + m, size - m);
   merge(a, size, m);
-}
-
-int kstrlen(const char *s)
-{
-  const char *sp;
-  for(sp = s; *sp; sp++)
-    ;
-  return sp - s;
 }
 
 int jj_kstrncmp(const char *s1, const char *s2, int size)

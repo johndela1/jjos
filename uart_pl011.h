@@ -34,7 +34,6 @@ typedef enum {
 } uart_error;
 
 void uart_putchar(char c);
-void uart_write(const char *s);
-void uart_writel(const char *s);
+void uart_write(const char *s, int size);
 uart_error uart_getchar(char *c);
 #endif

@@ -1,6 +1,8 @@
+.equ MODE_FIQ, 0x11
+.equ MODE_IRQ, 0x12
+.equ MODE_SVC, 0x13
+
 .data
-buf:
-	.asciz "32190"
 .text
 .code 32
 
@@ -21,21 +23,17 @@ _Reset:
 	b . /* 0x1C FIQ */
 
 start:
-	LDR sp, =stack_top
+	msr cpsr_c, MODE_FIQ
+	ldr sp, =stack_top
+	msr cpsr_c, MODE_IRQ
+	ldr sp, =stack_top
+	msr cpsr_c, MODE_SVC
+	ldr sp, =stack_top
+
 	bl kernel_main
 	b .
 
 kernel_main:
-	ldr r0, buf_p
-	bl uart_writel
-
-	ldr r0, buf_p
-	mov r1, #5
-	bl sort
-
-	ldr r0, buf_p
-	bl uart_writel
-
 	bl start_kernel
 	b .
 
@@ -51,6 +49,3 @@ b2:
 	bge b1
 	mov r1, r2
     bx lr
-
-buf_p:
-	.word buf

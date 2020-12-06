@@ -36,22 +36,50 @@ void run_divmods()
 static void parse_cmd()
 {
   if (!kstrncmp("uname\r", buf, kstrlen("uname\r")))
-      uart_write("jjos\n");
+      kputs("jjos\n");
   else if (!kstrncmp("sort", buf, kstrlen("sort"))) {
     char *bufp = &buf[kstrlen("sort")+1];
     int len = kstrlen(bufp);
-    sort(bufp, len);
+    ksort(bufp, len);
     pr_arr(bufp, len);
   }
   else
-    uart_write("command not found\n");
+    kputs("command not found\n");
 }
+
+/*
+struct tty_operations {
+    int (*write)(struct tty_struct * tty,
+                      const unsigned char *buf, int count);
+}
+
+struct tty_struct {
+    struct tty_operations *ops;
+
+}
+
+static const struct tty_operations uart_ops = {
+        .write = uart_write;
+}
+
+static int n_tty_write(struct tty_struct *tty, struct file *file,
+                           const unsigned char *buf, int nr)
+{
+    const unsigned char *b = buf;
+    while(nr > 0) {
+        c = tty->ops->write(tty, b, nr);
+        b += c;
+        nr -= c;
+    }
+}
+*/
+
 
 void start_kernel(void)
 {
   char c;
 
-  uart_write("# ");
+  kputs("# ");
   while(1) {
     if (uart_getchar(&c) == UART_OK) {
       uart_putchar(c);
@@ -60,10 +88,10 @@ void start_kernel(void)
       if (c == '\r') {
 	buf[buf_idx] = 0;
 
-	uart_putchar('\n');
+	kputs("\n");
 	buf_idx = 0;
 	parse_cmd();
-	uart_write("# ");
+	kputs("# ");
       }
     }
   }
