@@ -82,6 +82,18 @@ void start_kernel(void)
   kputs("# ");
   while(1) {
     if (c=kgetchar()) { //check if != EOF
+      if (c == 0x7f || c == '\b') {
+          c = '\b';
+          kputchar(c);
+          kputchar(' ');
+          kputchar(c);
+          buf_idx--;
+          continue;
+      }
+    if (c == 27) {
+        kputchar('\b');
+        continue;
+    }
       kputchar(c);
       buf[buf_idx % 64] = c;
       buf_idx++;
