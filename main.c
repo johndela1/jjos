@@ -81,7 +81,7 @@ void start_kernel(void)
 
   kputs("# ");
   while(1) {
-    if (c=kgetchar()) { //check if != EOF
+    if (c = kgetchar()) { //check if != EOF
       if (c == 0x7f || c == '\b') {
           c = '\b';
           kputchar(c);
@@ -91,7 +91,6 @@ void start_kernel(void)
           continue;
       }
     if (c == 27) {
-        kputchar('\b');
         continue;
     }
       kputchar(c);
