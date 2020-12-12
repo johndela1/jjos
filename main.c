@@ -93,6 +93,33 @@ void start_kernel(void)
     if (c == 27) {
         continue;
     }
+    if (c == 0x15) {
+        for (int i = 0; i < buf_idx; i++) {
+            buf[i] = 0;
+            kputchar('\b');
+        }
+        for (int i = 0; i < buf_idx; i++)
+            kputchar(' ');
+        for (int i = 0; i < buf_idx; i++)
+            kputchar('\b');
+
+        buf_idx = 0;
+        continue;
+    }
+    if (c == 0x17) {
+        int orig_buf_idx = buf_idx;
+        while(--buf_idx)
+            if (buf[buf_idx] == ' ')
+                break;
+        for (int i = buf_idx; i < orig_buf_idx; i++) {
+            buf[i] = 0;
+            kputchar('\b');
+        }
+        for (int i = buf_idx; i < orig_buf_idx; i++)
+            kputchar(' ');
+        for (int i = buf_idx; i < orig_buf_idx; i++)
+            kputchar('\b');
+    }
       kputchar(c);
       buf[buf_idx % 64] = c;
       buf_idx++;
