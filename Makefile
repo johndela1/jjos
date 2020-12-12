@@ -20,6 +20,10 @@ run: jjos.bin
 
 uart_pl011.o: uart_pl011.c
 	$(PRE)$(CC) -c $(CFLAGS) -mcpu=arm926ej-s uart_pl011.c -o uart_pl011.o
+TAGS: FORCE
+	find . -type f | etags -
 clean:
 	@rm -f *.out *.o *.elf *.bin
 	@rm -rf *.dSYM
+
+FORCE:
