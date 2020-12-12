@@ -58,11 +58,26 @@ void pr_arr(char a[], int size)
   uart_putchar('\n');
 }
 
-void kputs(char *buf)
+void kputs(char *s)
 {
-    uart_write(buf, kstrlen(buf));
+    uart_write(s, kstrlen(s));
 }
 
+void kputchar(int c)
+{
+  uart_putchar(c);
+}
+
+int kgetchar()
+{
+  int c;
+  enum uart_error result;
+  result = uart_getchar(&c);
+  if (result == UART_OK)
+    return c;
+  else
+    return 0;
+}
 
 #define MEMSIZE 4096
 static char memory[MEMSIZE];

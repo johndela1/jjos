@@ -24,16 +24,16 @@ typedef volatile struct __attribute__((packed)) {
 #define DR_DATA_MASK    (0xFFu)
 #define RSRECR_ERR_MASK (0xFu)
 
-typedef enum {
+enum uart_error {
         UART_OK = 0,
         UART_INVALID_ARGUMENT_BAUDRATE,
         UART_INVALID_ARGUMENT_WORDSIZE,
         UART_INVALID_ARGUMENT_STOP_BITS,
         UART_RECEIVE_ERROR,
         UART_NO_DATA
-} uart_error;
+};
 
-void uart_putchar(char c);
+void uart_putchar(int c);
 void uart_write(const char *s, int size);
-uart_error uart_getchar(char *c);
+enum uart_error uart_getchar(int *c);
 #endif

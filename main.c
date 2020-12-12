@@ -77,12 +77,12 @@ static int n_tty_write(struct tty_struct *tty, struct file *file,
 
 void start_kernel(void)
 {
-  char c;
+  int c;
 
   kputs("# ");
   while(1) {
-    if (uart_getchar(&c) == UART_OK) {
-      uart_putchar(c);
+    if (c=kgetchar()) { //check if != EOF
+      kputchar(c);
       buf[buf_idx % 64] = c;
       buf_idx++;
       if (c == '\r') {
