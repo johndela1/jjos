@@ -4,7 +4,7 @@ export PATH := $PWD/../gcc-arm-none-eabi-9-2020-q2-update/bin:$(PATH)
 PRE = ../gcc-arm-none-eabi-9-2020-q2-update/bin/arm-none-eabi-
 
 jjos.bin: head.o lib.o main.o uart_pl011.o
-	$(PRE)ld -T test.ld lib.o main.o head.o uart_pl011.o -o jjos.elf
+	$(PRE)ld -T linkscript.ld lib.o main.o head.o uart_pl011.o -o jjos.elf
 	$(PRE)objcopy -O binary jjos.elf jjos.bin
 
 head.o: head.S
