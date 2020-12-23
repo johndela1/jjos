@@ -24,11 +24,11 @@ _Reset:
 
 start:
 	msr cpsr_c, MODE_FIQ
-	ldr sp, =stack_top
+	ldr sp, =fiq_stack_top
 	msr cpsr_c, MODE_IRQ
-	ldr sp, =stack_top
+	ldr sp, =irq_stack_top
 	msr cpsr_c, MODE_SVC
-	ldr sp, =stack_top
+	ldr sp, =_stack_top
 
 	bl kernel_main
 	b .
