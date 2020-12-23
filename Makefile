@@ -17,6 +17,8 @@ main.o: main.c
 	$(PRE)$(CC) -c $(CFLAGS) -mcpu=arm926ej-s main.c -o main.o
 run: jjos.bin
 	qemu-system-arm -M versatilepb -m 128M -nographic -kernel jjos.bin
+runa: jjos.bin
+	qemu-system-arm -M vexpress-a9 -m 128M -nographic -kernel jjos.bin
 
 uart_pl011.o: uart_pl011.c
 	$(PRE)$(CC) -c $(CFLAGS) -mcpu=arm926ej-s uart_pl011.c -o uart_pl011.o
