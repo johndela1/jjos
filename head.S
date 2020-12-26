@@ -1,41 +1,50 @@
-.equ MODE_FIQ, 0x11
-.equ MODE_IRQ, 0x12
-.equ MODE_SVC, 0x13
-
-.data
 .text
-.code 32
+ .code 32
 
-@ Register  definition, for ARM VersatilePB with PL011 UART
-.equ    UART0_BASE, 0x101f1000
-.equ    UARTDR,     0x0
-.equ	RTC, 	    0x101E8000
-.global _Reset
-.global divmod
-_Reset:
-	b start
-	b .
-	b . /* 0x8  Software Interrupt */
-	b .
-	b .
-	b . /* 0x14 Reserved */
-	b . /* 0x18 IRQ */
-	b . /* 0x1C FIQ */
+ .global vectors_start
+ .global vectors_end
+ .global divmod
 
-start:
-	msr cpsr_c, MODE_FIQ
-	ldr sp, =fiq_stack_top
-	msr cpsr_c, MODE_IRQ
-	ldr sp, =irq_stack_top
-	msr cpsr_c, MODE_SVC
-	ldr sp, =_stack_top
+vectors_start:
+ LDR PC, reset_handler_addr
+ LDR PC, undef_handler_addr
+ LDR PC, swi_handler_addr
+ LDR PC, prefetch_abort_handler_addr
+ LDR PC, data_abort_handler_addr
+ B .
+ LDR PC, irq_handler_addr
+ LDR PC, fiq_handler_addr
 
-	bl kernel_main
-	b .
+reset_handler_addr: .word reset_handler
+undef_handler_addr: .word undef_handler
+swi_handler_addr: .word swi_handler
+prefetch_abort_handler_addr: .word prefetch_abort_handler
+data_abort_handler_addr: .word data_abort_handler
+irq_handler_addr: .word irq_handler
+fiq_handler_addr: .word fiq_handler
 
-kernel_main:
-	bl start_kernel
-	b .
+vectors_end:
+
+reset_handler:
+ /* set Supervisor stack */
+ LDR sp, =stack_top
+ /* copy vector table to address 0 */
+ BL copy_vectors
+ /* get Program Status Register */
+ MRS r0, cpsr
+ /* go in IRQ mode */
+ BIC r1, r0, #0x1F
+ ORR r1, r1, #0x12
+ MSR cpsr, r1
+ /* set IRQ stack */
+ LDR sp, =irq_stack_top
+ /* Enable IRQs */
+ BIC r0, r0, #0x80
+ /* go back in Supervisor mode */
+ MSR cpsr, r0
+ /* jump to main */
+ BL start_kernel
+ B .
 
 divmod:
     @ r0 dividend, r1 devisor, r2 quotient

@@ -1,5 +1,14 @@
 #include "lib.h"
 #include "uart_pl011.h"
+#include <stdint.h>
+
+#define UART0_BASE_ADDR 0x101f1000
+#define UART0_DR (*((volatile uint32_t *)(UART0_BASE_ADDR + 0x000)))
+#define UART0_IMSC (*((volatile uint32_t *)(UART0_BASE_ADDR + 0x038)))
+
+#define VIC_BASE_ADDR 0x10140000
+#define VIC_INTENABLE (*((volatile uint32_t *)(VIC_BASE_ADDR + 0x010)))
+
 
 char buf[64];
 char buf_idx = 0;
@@ -74,13 +83,8 @@ static int n_tty_write(struct tty_struct *tty, struct file *file,
 }
 */
 
-
-void start_kernel(void)
-{
+void __attribute__((interrupt)) irq_handler() {
   int c;
-
-  kputs("# ");
-  while(1) {
     if (c = kgetchar()) { //check if != EOF
       if (c == 0x7f || c == '\b') {
           c = '\b';
@@ -88,10 +92,10 @@ void start_kernel(void)
           kputchar(' ');
           kputchar(c);
           buf_idx--;
-          continue;
+          return;
       }
     if (c == 27) {
-        continue;
+        return;
     }
     if (c == 0x15) {
         for (int i = 0; i < buf_idx; i++) {
@@ -104,7 +108,7 @@ void start_kernel(void)
             kputchar('\b');
 
         buf_idx = 0;
-        continue;
+        return;
     }
     if (c == 0x17) {
         int orig_buf_idx = buf_idx;
@@ -132,5 +136,32 @@ void start_kernel(void)
 	kputs("# ");
       }
     }
-  }
+}
+
+/* all other handlers are infinite loops */
+void __attribute__((interrupt)) undef_handler(void) { for(;;); }
+void __attribute__((interrupt)) swi_handler(void) { for(;;); }
+void __attribute__((interrupt)) prefetch_abort_handler(void) { for(;;); }
+void __attribute__((interrupt)) data_abort_handler(void) { for(;;); }
+void __attribute__((interrupt)) fiq_handler(void) { for(;;); }
+
+void copy_vectors(void) {
+ extern uint32_t vectors_start;
+ extern uint32_t vectors_end;
+ uint32_t *vectors_src = &vectors_start;
+ uint32_t *vectors_dst = (uint32_t *)0;
+
+while(vectors_src < &vectors_end)
+ *vectors_dst++ = *vectors_src++;
+}
+
+void start_kernel(void)
+{
+  kputs("# ");
+
+ /* enable UART0 IRQ */
+ VIC_INTENABLE = 1<<12;
+ /* enable RXIM interrupt */
+ UART0_IMSC = 1<<4;
+ for(;;);
 }
