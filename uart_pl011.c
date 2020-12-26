@@ -4,7 +4,7 @@ static uart_registers* uart0 = (uart_registers*)0x101f1000u;
 
 void uart_putchar(int c)
 {
-  // while (uart0->FR && FR_TXFF);
+  while (uart0->FR & FR_TXFF);
   uart0->DR = (unsigned int)c;
 }
 
