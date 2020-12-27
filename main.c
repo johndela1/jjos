@@ -9,9 +9,20 @@
 #define VIC_BASE_ADDR 0x10140000
 #define VIC_INTENABLE (*((volatile uint32_t *)(VIC_BASE_ADDR + 0x010)))
 
+#define TIMER0 ((volatile unsigned int*)0x101E2000)
+#define TIMER_VALUE 0x1 /* 0x04 bytes */
+#define TIMER_CONTROL 0x2 /* 0x08 bytes */
+#define TIMER_INTCLR 0x3 /* 0x0C bytes */
+#define TIMER_MIS 0x5 /* 0x14 bytes */
+#define TIMER_EN 0x80
+#define TIMER_PERIODIC 0x40
+#define TIMER_INTEN 0x20
+#define TIMER_32BIT 0x02
+#define TIMER_ONESHOT 0x01
 
 char buf[64];
 char buf_idx = 0;
+unsigned long jiffies = 0;
 
 void run_divmods()
 {
@@ -51,13 +62,14 @@ static void parse_cmd()
     int len = kstrlen(bufp);
     ksort(bufp, len);
     pr_arr(bufp, len);
-  }
-  else
+  } else if (!kstrncmp("date", buf, kstrlen("date"))) {
+        print_num(jiffies);
+  } else
     kputs("command not found\n");
 }
 
 void __attribute__((interrupt)) irq_handler() {
-  int c;
+    int c;
     if (c = kgetchar()) { //check if != EOF
       if (c == 0x7f || c == '\b') {
           c = '\b';
@@ -111,7 +123,6 @@ void __attribute__((interrupt)) irq_handler() {
     }
 }
 
-/* all other handlers are infinite loops */
 void __attribute__((interrupt)) undef_handler(void) { for(;;); }
 void __attribute__((interrupt)) swi_handler(void) { for(;;); }
 void __attribute__((interrupt)) prefetch_abort_handler(void) { for(;;); }
@@ -128,13 +139,25 @@ while(vectors_src < &vectors_end)
  *vectors_dst++ = *vectors_src++;
 }
 
-void start_kernel(void)
+void timer_init()
 {
-  kputs("# ");
+     *TIMER0 = 1000000;
+     *(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_ONESHOT | TIMER_32BIT;
+     /* enable UART0 IRQ */
+     VIC_INTENABLE = 1<<12;
+     /* enable RXIM interrupt */
+     UART0_IMSC = 1<<4;
+}
 
- /* enable UART0 IRQ */
- VIC_INTENABLE = 1<<12;
- /* enable RXIM interrupt */
- UART0_IMSC = 1<<4;
- for(;;);
+void start_kernel(void)
+{    timer_init();
+     kputs("# ");
+
+     while(1) {
+     if(!*(TIMER0+TIMER_VALUE)) {
+       jiffies++;
+       *TIMER0 = 1000000;
+       *(TIMER0 + TIMER_CONTROL) = TIMER_EN | TIMER_ONESHOT | TIMER_32BIT;
+     }
+ }
 }
