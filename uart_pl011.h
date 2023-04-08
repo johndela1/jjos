@@ -18,8 +18,8 @@ typedef volatile struct __attribute__((packed)) {
     uint32_t CR;                /* 0x30 Control register */
 } uart_registers;
 
-#define FR_TXFF         (1 << 5u)
-#define FR_RXFE         (1 << 4u)
+#define FR_TXFF         (1 << 5u) /* Transmit FIFO full */
+#define FR_RXFE         (1 << 4u) /* Transmit FIFO empty */
 
 #define DR_DATA_MASK    (0xFFu)
 #define RSRECR_ERR_MASK (0xFu)
